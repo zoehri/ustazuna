@@ -124,8 +124,8 @@ const SplashScreen = ({ onFinish }) => {
 
 const LoginScreen = ({ onLogin, onSwitchToRegister }) => {
   return (
-    <div className='min-h-screen bg-emerald-50 flex flex-col justify-center px-6 py-12'>
-      <div className='sm:mx-auto sm:w-full sm:max-w-md bg-white p-8 rounded-3xl shadow-xl border border-emerald-100'>
+    <div className='min-h-screen bg-emerald-50 flex flex-col items-center justify-center px-6 py-12 w-full'>
+      <div className='w-full sm:max-w-md bg-white p-8 rounded-3xl shadow-xl border border-emerald-100'>
         <div className='text-center mb-10'>
           <div className='w-16 h-16 bg-emerald-600 rounded-2xl mx-auto flex items-center justify-center mb-4 shadow-lg text-3xl'>
             🕌
@@ -193,8 +193,8 @@ const RegisterScreen = ({ onRegister, onSwitchToLogin }) => {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <div className='min-h-screen bg-emerald-50 flex flex-col justify-center px-6 py-8'>
-      <div className='max-w-xl mx-auto w-full bg-white p-8 rounded-3xl shadow-xl border border-emerald-100'>
+    <div className='min-h-screen bg-emerald-50 flex flex-col items-center justify-center px-6 py-8 w-full'>
+      <div className='max-w-xl w-full bg-white p-8 rounded-3xl shadow-xl border border-emerald-100'>
         <div className='text-center mb-8'>
           <h2 className='text-2xl font-bold text-gray-900'>Daftar Akun Baru</h2>
           <p className='text-sm text-gray-500 mt-1'>
@@ -358,8 +358,8 @@ const UstadzCard = ({ data, onClick }) => (
 const DetailView = ({ data, onBack }) => {
   if (!data) return null;
   return (
-    <div className='min-h-screen bg-gray-50 pb-24 md:pb-10'>
-      <div className='max-w-4xl mx-auto bg-white md:mt-8 md:rounded-3xl md:shadow-2xl overflow-hidden border border-gray-100'>
+    <div className='min-h-screen bg-gray-50 pb-24 md:pb-10 w-full flex justify-center'>
+      <div className='max-w-4xl w-full bg-white md:mt-8 md:rounded-3xl md:shadow-2xl overflow-hidden border border-gray-100 h-fit'>
         <div className='h-44 md:h-64 bg-emerald-700 relative'>
           <button
             onClick={onBack}
@@ -717,67 +717,72 @@ export default function App() {
   };
 
   return (
-    <div className='bg-emerald-50 min-h-screen font-sans'>
+    <div className='bg-emerald-50 min-h-screen font-sans flex flex-col items-center'>
       {/* Navbar Desktop */}
-      <div className='hidden md:flex bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-emerald-100 py-4 px-10 items-center justify-between'>
-        <div
-          className='flex items-center gap-3 cursor-pointer'
-          onClick={() => {
-            setActiveTab('home');
-            setSelectedUstadz(null);
-          }}
-        >
-          <div className='bg-emerald-600 p-2 rounded-xl text-white font-bold'>
-            🕌
-          </div>
-          <h1 className='text-xl font-black text-emerald-800 tracking-tight'>
-            Cari<span className='text-yellow-500'>Ustadz</span>
-          </h1>
-        </div>
-        <div className='flex items-center gap-8'>
-          <button
+      <div className='hidden md:flex bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-emerald-100 py-4 px-10 items-center justify-center w-full'>
+        <div className='max-w-6xl w-full flex items-center justify-between'>
+          <div
+            className='flex items-center gap-3 cursor-pointer'
             onClick={() => {
               setActiveTab('home');
               setSelectedUstadz(null);
             }}
-            className={`text-sm font-bold flex items-center gap-2 ${
-              activeTab === 'home'
-                ? 'text-emerald-600'
-                : 'text-gray-500 hover:text-emerald-500'
-            }`}
           >
-            <Home size={18} /> Beranda
-          </button>
-          <button
-            onClick={() => {
-              setActiveTab('search');
-              setSelectedUstadz(null);
-            }}
-            className={`text-sm font-bold flex items-center gap-2 ${
-              activeTab === 'search'
-                ? 'text-emerald-600'
-                : 'text-gray-500 hover:text-emerald-500'
-            }`}
-          >
-            <Search size={18} /> Eksplorasi
-          </button>
-          <button
-            onClick={() => {
-              setActiveTab('profile');
-              setSelectedUstadz(null);
-            }}
-            className={`text-sm font-bold flex items-center gap-2 ${
-              activeTab === 'profile'
-                ? 'text-emerald-600'
-                : 'text-gray-500 hover:text-emerald-500'
-            }`}
-          >
-            <User size={18} /> Profil
-          </button>
+            <div className='bg-emerald-600 p-2 rounded-xl text-white font-bold'>
+              🕌
+            </div>
+            <h1 className='text-xl font-black text-emerald-800 tracking-tight'>
+              Cari<span className='text-yellow-500'>Ustadz</span>
+            </h1>
+          </div>
+          <div className='flex items-center gap-8'>
+            <button
+              onClick={() => {
+                setActiveTab('home');
+                setSelectedUstadz(null);
+              }}
+              className={`text-sm font-bold flex items-center gap-2 ${
+                activeTab === 'home'
+                  ? 'text-emerald-600'
+                  : 'text-gray-500 hover:text-emerald-500'
+              }`}
+            >
+              <Home size={18} /> Beranda
+            </button>
+            <button
+              onClick={() => {
+                setActiveTab('search');
+                setSelectedUstadz(null);
+              }}
+              className={`text-sm font-bold flex items-center gap-2 ${
+                activeTab === 'search'
+                  ? 'text-emerald-600'
+                  : 'text-gray-500 hover:text-emerald-500'
+              }`}
+            >
+              <Search size={18} /> Eksplorasi
+            </button>
+            <button
+              onClick={() => {
+                setActiveTab('profile');
+                setSelectedUstadz(null);
+              }}
+              className={`text-sm font-bold flex items-center gap-2 ${
+                activeTab === 'profile'
+                  ? 'text-emerald-600'
+                  : 'text-gray-500 hover:text-emerald-500'
+              }`}
+            >
+              <User size={18} /> Profil
+            </button>
+          </div>
         </div>
       </div>
 
-      <div className='flex-1'>{renderContent()}</div>
+      {/* Konten Utama */}
+      <div className='flex-1 w-full flex flex-col items-center'>
+        {renderContent()}
+      </div>
 
       {/* Navbar Mobile Only */}
       {!selectedUstadz && (
