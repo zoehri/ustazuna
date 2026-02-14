@@ -15,7 +15,32 @@ import {
   LogOut,
   Eye,
   EyeOff,
+  Settings,
+  Copy,
+  CheckCircle,
+  Save,
+  Database,
 } from 'lucide-react';
+
+// --- KODE GOOGLE APPS SCRIPT UNTUK DITAMPILKAN ---
+const GAS_SCRIPT_CODE = `function doPost(e) {
+  // Ganti 'Sheet1' dengan nama tab sheet Anda jika berbeda
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Sheet1");
+  
+  var data = JSON.parse(e.postData.contents);
+  
+  sheet.appendRow([
+    new Date(),
+    data.namaDepan,
+    data.namaBelakang,
+    data.email,
+    data.hp,
+    data.alamat
+  ]);
+  
+  return ContentService.createTextOutput(JSON.stringify({"result":"success"}))
+    .setMimeType(ContentService.MimeType.JSON);
+}`;
 
 // --- Data Mock (Data Buatan) ---
 const CATEGORIES = [
@@ -150,7 +175,7 @@ const LoginScreen = ({ onLogin, onSwitchToRegister }) => {
             <input
               type='email'
               required
-              className='mt-2 block w-full rounded-xl border-gray-200 py-3 px-4 text-gray-900 shadow-sm ring-1 ring-gray-300 focus:ring-2 focus:ring-emerald-600 outline-none'
+              className='mt-2 block w-full rounded-xl border-gray-200 bg-white py-3 px-4 text-gray-900 shadow-sm ring-1 ring-gray-300 focus:ring-2 focus:ring-emerald-600 outline-none'
               placeholder='nama@email.com'
             />
           </div>
@@ -162,7 +187,7 @@ const LoginScreen = ({ onLogin, onSwitchToRegister }) => {
             <input
               type='password'
               required
-              className='mt-2 block w-full rounded-xl border-gray-200 py-3 px-4 text-gray-900 shadow-sm ring-1 ring-gray-300 focus:ring-2 focus:ring-emerald-600 outline-none'
+              className='mt-2 block w-full rounded-xl border-gray-200 bg-white py-3 px-4 text-gray-900 shadow-sm ring-1 ring-gray-300 focus:ring-2 focus:ring-emerald-600 outline-none'
               placeholder='••••••••'
             />
           </div>
@@ -191,6 +216,27 @@ const LoginScreen = ({ onLogin, onSwitchToRegister }) => {
 
 const RegisterScreen = ({ onRegister, onSwitchToLogin }) => {
   const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    namaDepan: '',
+    namaBelakang: '',
+    alamat: '',
+    hp: '',
+    email: '',
+    password: '',
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    // Kirim data ke parent component untuk diproses
+    await onRegister(formData);
+    setIsSubmitting(false);
+  };
 
   return (
     <div className='min-h-screen bg-emerald-50 flex flex-col items-center justify-center px-6 py-8 w-full'>
@@ -202,13 +248,7 @@ const RegisterScreen = ({ onRegister, onSwitchToLogin }) => {
           </p>
         </div>
 
-        <form
-          className='space-y-4'
-          onSubmit={(e) => {
-            e.preventDefault();
-            onRegister();
-          }}
-        >
+        <form className='space-y-4' onSubmit={handleSubmit}>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
             <div>
               <label className='block text-xs font-medium text-gray-700 mb-1'>
@@ -216,8 +256,10 @@ const RegisterScreen = ({ onRegister, onSwitchToLogin }) => {
               </label>
               <input
                 type='text'
+                name='namaDepan'
                 required
-                className='w-full rounded-xl border-gray-200 bg-gray-50 border py-2.5 px-3 text-sm focus:ring-2 focus:ring-emerald-500 outline-none'
+                onChange={handleChange}
+                className='w-full rounded-xl border-gray-200 bg-white border py-2.5 px-3 text-sm focus:ring-2 focus:ring-emerald-500 outline-none'
                 placeholder='Contoh: Ahmad'
               />
             </div>
@@ -227,8 +269,10 @@ const RegisterScreen = ({ onRegister, onSwitchToLogin }) => {
               </label>
               <input
                 type='text'
+                name='namaBelakang'
                 required
-                className='w-full rounded-xl border-gray-200 bg-gray-50 border py-2.5 px-3 text-sm focus:ring-2 focus:ring-emerald-500 outline-none'
+                onChange={handleChange}
+                className='w-full rounded-xl border-gray-200 bg-white border py-2.5 px-3 text-sm focus:ring-2 focus:ring-emerald-500 outline-none'
                 placeholder='Contoh: Fulan'
               />
             </div>
@@ -239,9 +283,11 @@ const RegisterScreen = ({ onRegister, onSwitchToLogin }) => {
               Alamat Lengkap
             </label>
             <textarea
+              name='alamat'
               rows={2}
               required
-              className='w-full rounded-xl border-gray-200 bg-gray-50 border py-2.5 px-3 text-sm focus:ring-2 focus:ring-emerald-500 outline-none'
+              onChange={handleChange}
+              className='w-full rounded-xl border-gray-200 bg-white border py-2.5 px-3 text-sm focus:ring-2 focus:ring-emerald-500 outline-none'
               placeholder='Alamat rumah tinggal saat ini'
             />
           </div>
@@ -253,8 +299,10 @@ const RegisterScreen = ({ onRegister, onSwitchToLogin }) => {
               </label>
               <input
                 type='tel'
+                name='hp'
                 required
-                className='w-full rounded-xl border-gray-200 bg-gray-50 border py-2.5 px-3 text-sm focus:ring-2 focus:ring-emerald-500 outline-none'
+                onChange={handleChange}
+                className='w-full rounded-xl border-gray-200 bg-white border py-2.5 px-3 text-sm focus:ring-2 focus:ring-emerald-500 outline-none'
                 placeholder='0812XXXXXXXX'
               />
             </div>
@@ -264,8 +312,10 @@ const RegisterScreen = ({ onRegister, onSwitchToLogin }) => {
               </label>
               <input
                 type='email'
+                name='email'
                 required
-                className='w-full rounded-xl border-gray-200 bg-gray-50 border py-2.5 px-3 text-sm focus:ring-2 focus:ring-emerald-500 outline-none'
+                onChange={handleChange}
+                className='w-full rounded-xl border-gray-200 bg-white border py-2.5 px-3 text-sm focus:ring-2 focus:ring-emerald-500 outline-none'
                 placeholder='nama@email.com'
               />
             </div>
@@ -278,8 +328,10 @@ const RegisterScreen = ({ onRegister, onSwitchToLogin }) => {
             <div className='relative'>
               <input
                 type={showPassword ? 'text' : 'password'}
+                name='password'
                 required
-                className='w-full rounded-xl border-gray-200 bg-gray-50 border py-2.5 px-3 text-sm pr-10 focus:ring-2 focus:ring-emerald-500 outline-none'
+                onChange={handleChange}
+                className='w-full rounded-xl border-gray-200 bg-white border py-2.5 px-3 text-sm pr-10 focus:ring-2 focus:ring-emerald-500 outline-none'
                 placeholder='Minimal 8 karakter'
               />
               <button
@@ -294,9 +346,10 @@ const RegisterScreen = ({ onRegister, onSwitchToLogin }) => {
 
           <button
             type='submit'
-            className='w-full mt-4 rounded-full bg-emerald-600 py-3 text-sm font-semibold text-white shadow-lg hover:bg-emerald-500 transition-all active:scale-95'
+            disabled={isSubmitting}
+            className='w-full mt-4 rounded-full bg-emerald-600 py-3 text-sm font-semibold text-white shadow-lg hover:bg-emerald-500 transition-all active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed'
           >
-            Daftar Sekarang
+            {isSubmitting ? 'Memproses...' : 'Daftar Sekarang'}
           </button>
         </form>
 
@@ -462,6 +515,105 @@ const DetailView = ({ data, onBack }) => {
   );
 };
 
+// --- Komponen Admin (Untuk Konfigurasi) ---
+const AdminConfig = ({ onClose }) => {
+  const [url, setUrl] = useState('');
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    // Ambil URL dari localStorage saat komponen dibuka
+    const savedUrl = localStorage.getItem('googleSheetUrl');
+    if (savedUrl) setUrl(savedUrl);
+  }, []);
+
+  const handleSave = () => {
+    localStorage.setItem('googleSheetUrl', url);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
+
+  const copyScript = () => {
+    navigator.clipboard.writeText(GAS_SCRIPT_CODE);
+    alert('Script disalin ke clipboard!');
+  };
+
+  return (
+    <div className='fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4'>
+      <div className='bg-white rounded-3xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl'>
+        <div className='flex justify-between items-center mb-6'>
+          <h2 className='text-2xl font-black text-gray-900 flex items-center gap-2'>
+            <Settings className='text-emerald-600' /> Admin Konfigurasi
+          </h2>
+          <button
+            onClick={onClose}
+            className='p-2 bg-gray-100 rounded-full hover:bg-red-100 hover:text-red-600 transition-all'
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        <div className='space-y-6'>
+          {/* Section Input URL */}
+          <div className='bg-emerald-50 p-5 rounded-2xl border border-emerald-100'>
+            <label className='block text-sm font-bold text-emerald-800 mb-2'>
+              1. URL Google Web App
+            </label>
+            <p className='text-xs text-emerald-600 mb-3'>
+              Paste URL deployment (https://script.google.com/...) di sini agar
+              data registrasi tersimpan.
+            </p>
+            <div className='flex gap-2'>
+              <input
+                type='text'
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                placeholder='https://script.google.com/macros/s/...'
+                className='flex-1 rounded-xl border-gray-300 bg-white py-2 px-4 text-sm focus:ring-2 focus:ring-emerald-500 outline-none shadow-sm'
+              />
+              <button
+                onClick={handleSave}
+                className='bg-emerald-600 text-white px-4 py-2 rounded-xl font-bold flex items-center gap-2 hover:bg-emerald-700 transition-all'
+              >
+                {saved ? <CheckCircle size={18} /> : <Save size={18} />}
+                {saved ? 'Tersimpan' : 'Simpan'}
+              </button>
+            </div>
+          </div>
+
+          {/* Section Show Script */}
+          <div className='bg-gray-50 p-5 rounded-2xl border border-gray-200'>
+            <div className='flex justify-between items-center mb-3'>
+              <div>
+                <label className='block text-sm font-bold text-gray-800'>
+                  2. Google Apps Script (GAS)
+                </label>
+                <p className='text-xs text-gray-500'>
+                  Copy kode ini ke Extensions {'>'} Apps Script di Google Sheet
+                  Anda.
+                </p>
+              </div>
+              <button
+                onClick={copyScript}
+                className='text-xs bg-white border border-gray-300 px-3 py-1.5 rounded-lg font-bold flex items-center gap-1 hover:bg-gray-100'
+              >
+                <Copy size={14} /> Salin Script
+              </button>
+            </div>
+            <div className='bg-gray-900 text-gray-100 p-4 rounded-xl text-xs font-mono overflow-x-auto whitespace-pre'>
+              {GAS_SCRIPT_CODE}
+            </div>
+          </div>
+
+          <div className='text-center text-xs text-gray-400 italic'>
+            Catatan: Pastikan deploy sebagai "Web App" dan Who has access =
+            "Anyone".
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // --- Komponen Utama ---
 
 export default function App() {
@@ -472,8 +624,41 @@ export default function App() {
   const [selectedUstadz, setSelectedUstadz] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
+  const [showAdmin, setShowAdmin] = useState(false); // State untuk modal admin
 
   if (loading) return <SplashScreen onFinish={() => setLoading(false)} />;
+
+  // Fungsi Register yang Mengirim ke Google Sheet
+  const handleRegister = async (formData) => {
+    const scriptUrl = localStorage.getItem('googleSheetUrl');
+
+    if (!scriptUrl) {
+      alert(
+        'Error: URL Database belum disetting! Silakan masuk sebagai tamu/login dummy dulu, lalu atur di Profil > Pengaturan Database.'
+      );
+      // Tetap login dummy agar user tidak stuck
+      setIsLoggedIn(true);
+      return;
+    }
+
+    try {
+      // Menggunakan mode no-cors karena keterbatasan GAS pada browser client-side
+      await fetch(scriptUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      alert('Pendaftaran Berhasil! Data Anda telah tersimpan.');
+      setIsLoggedIn(true);
+    } catch (error) {
+      console.error('Error saving data', error);
+      alert('Gagal menyimpan data ke Google Sheet. Cek koneksi internet.');
+    }
+  };
 
   if (!isLoggedIn) {
     return authMode === 'login' ? (
@@ -483,7 +668,7 @@ export default function App() {
       />
     ) : (
       <RegisterScreen
-        onRegister={() => setIsLoggedIn(true)}
+        onRegister={handleRegister}
         onSwitchToLogin={() => setAuthMode('login')}
       />
     );
@@ -679,10 +864,16 @@ export default function App() {
               {[
                 { label: 'Riwayat Undangan', icon: <Calendar size={18} /> },
                 { label: 'Ustadz Favorit', icon: <Star size={18} /> },
-                { label: 'Pengaturan Akun', icon: <User size={18} /> },
+                // Menu Baru untuk Admin/Database
+                {
+                  label: 'Pengaturan Database',
+                  icon: <Database size={18} />,
+                  action: () => setShowAdmin(true), // Buka modal admin
+                },
               ].map((item, idx) => (
                 <div
                   key={idx}
+                  onClick={item.action || null}
                   className='p-5 border-b border-gray-50 flex items-center justify-between hover:bg-emerald-50 cursor-pointer transition-colors group'
                 >
                   <div className='flex items-center gap-4'>
@@ -718,6 +909,9 @@ export default function App() {
 
   return (
     <div className='bg-emerald-50 min-h-screen font-sans flex flex-col items-center'>
+      {/* Modal Admin Config */}
+      {showAdmin && <AdminConfig onClose={() => setShowAdmin(false)} />}
+
       {/* Navbar Desktop */}
       <div className='hidden md:flex bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-emerald-100 py-4 px-10 items-center justify-center w-full'>
         <div className='max-w-6xl w-full flex items-center justify-between'>
